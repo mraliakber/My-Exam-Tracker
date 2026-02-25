@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ur">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Tracker 📚</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a26;
+            --border: #2a2a3d;
+            --accent: #7c5cfc;
+            --accent2: #fc5c7d;
+            --accent3: #5cf8c8;
+            --text: #e8e8f0;
+            --muted: #6b6b8a;
+            --gold: #ffd166;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated bg */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 20% 20%, rgba(124, 92, 252, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(252, 92, 125, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(92, 248, 200, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgShift 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(2%, 2%);
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+            position: relative;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .date-display {
+            font-family: 'Space Mono', monospace;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+        }
+
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #9b7bff);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 92, 252, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid rgba(252, 92, 125, 0.4);
+            color: var(--accent2);
+            padding: 7px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .btn-danger:hover {
+            background: rgba(252, 92, 125, 0.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            animation: popIn 0.25s ease;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.92) translateY(10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .modal h2 span {
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        /* Subject Cards */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+            margin-top: 10px;
+        }
+
+        .subject-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .subject-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .subject-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .subject-info {
+            flex: 1;
+        }
+
+        .subject-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .subject-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .subject-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* Progress bar */
+        .progress-section {
+            padding: 14px 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .progress-label span:last-child {
+            color: var(--accent3);
+            font-weight: 700;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: var(--surface2);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--accent), var(--accent3));
+            transition: width 0.5s ease;
+        }
+
+        /* Chapters */
+        .chapters-section {
+            padding: 14px 20px;
+        }
+
+        .chapters-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--surface2);
+            border-radius: 10px;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .chapter-item:hover {
+            border-color: var(--border);
+        }
+
+        .chapter-item.done {
+            background: rgba(92, 248, 200, 0.06);
+            border-color: rgba(92, 248, 200, 0.2);
+        }
+
+        .chapter-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            font-size: 11px;
+        }
+
+        .chapter-item.done .chapter-check {
+            background: var(--accent3);
+            border-color: var(--accent3);
+            color: #0a0a0f;
+        }
+
+        .chapter-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chapter-name {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chapter-item.done .chapter-name {
+            text-decoration: line-through;
+            color: var(--muted);
+        }
+
+        .chapter-marks {
+            font-size: 11px;
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .del-chapter {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .chapter-item:hover .del-chapter {
+            opacity: 1;
+        }
+
+        .del-chapter:hover {
+            color: var(--accent2);
+        }
+
+        .add-chapter-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-chapter-form input {
+            flex: 1;
+            min-width: 100px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .add-chapter-form input:focus {
+            border-color: var(--accent);
+        }
+
+        .add-chapter-form input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn-add-chapter {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, var(--accent), #9b7bff);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .btn-add-chapter:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Daily Log */
+        .daily-section {
+            padding: 14px 20px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .daily-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .log-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .log-input-row textarea {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            resize: none;
+            height: 60px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .log-input-row textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-log {
+            padding: 9px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            align-self: flex-end;
+        }
+
+        .btn-log:hover {
+            border-color: var(--accent);
+            background: rgba(124, 92, 252, 0.1);
+        }
+
+        .log-entries {
+            max-height: 140px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 10px;
+            padding: 8px 10px;
+            background: var(--surface2);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .log-date {
+            font-family: 'Space Mono', monospace;
+            color: var(--accent);
+            font-size: 10px;
+            white-space: nowrap;
+            padding-top: 1px;
+        }
+
+        .log-text {
+            color: var(--text);
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .del-log {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .log-entry:hover .del-log {
+            opacity: 1;
+        }
+
+        .del-log:hover {
+            color: var(--accent2);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Color swatches */
+        .color-swatches {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .swatch.selected {
+            border-color: white;
+            transform: scale(1.2);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 99px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 24px 20px;
+            }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 28px 0 16px;
+        }
+
+        .section-header h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+        }
+
+        .exam-date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 209, 102, 0.12);
+            border: 1px solid rgba(255, 209, 102, 0.3);
+            color: var(--gold);
+            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="header-badge">📚 2nd Year Exam Tracker</div>
+            <h1>Apna Syllabus<br>Track Karo</h1>
+            <div class="date-display" id="currentDate"></div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-num" id="statSubjects">0</div>
+                <div class="stat-label">Subjects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statChapters">0</div>
+                <div class="stat-label">Chapters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statDone">0</div>
+                <div class="stat-label">Done ✓</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statMarks">0</div>
+                <div class="stat-label">Marks Covered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statPct">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="openModal('addSubjectModal')">
+                ＋ Naya Subject
+            </button>
+            <button class="btn btn-secondary" onclick="toggleView()">
+                <span id="viewIcon">📋</span> <span id="viewLabel">Compact View</span>
+            </button>
+        </div>
+
+        <!-- Subjects -->
+        <div class="section-header">
+            <h2>Mere Subjects</h2>
+        </div>
+
+        <div class="subjects-grid" id="subjectsGrid">
+            <div class="empty-state" id="emptyState">
+                <div class="icon">📖</div>
+                <h3>Abhi Koi Subject Nahi</h3>
+                <p>Upar "+ Naya Subject" button dabao aur apna pehla subject add karo!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div class="modal-overlay" id="addSubjectModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('addSubjectModal')">✕</button>
+            <h2>Naya <span>Subject</span> Add Karo</h2>
+            <div class="form-group">
+                <label>Subject Ka Naam</label>
+                <input type="text" id="subjectName" placeholder="e.g. Mathematics, Physics, Chemistry...">
+            </div>
+            <div class="form-group">
+                <label>Total Marks (Paper)</label>
+                <input type="number" id="subjectTotal" placeholder="e.g. 100">
+            </div>
+            <div class="form-group">
+                <label>Exam Date (Optional)</label>
+                <input type="date" id="subjectExamDate">
+            </div>
+            <div class="form-group">
+                <label>Rang Chuno</label>
+                <div class="color-swatches" id="colorSwatches"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:8px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addSubject()">Subject Add Karo ✓</button>
+                <button class="btn btn-secondary" onclick="closeModal('addSubjectModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATA =====
+        const COLORS = ['#7c5cfc', '#fc5c7d', '#5cf8c8', '#ffd166', '#ff9f43', '#54a0ff', '#ee5a24', '#a29bfe', '#fd79a8', '#00cec9'];
+        let selectedColor = COLORS[0];
+        let data = JSON.parse(localStorage.getItem('examTracker') || '{"subjects":[]}');
+        let compactView = false;
+
+        // ===== INIT =====
+        function init() {
+            updateDateDisplay();
+            buildColorSwatches();
+            render();
+            setInterval(updateDateDisplay, 60000);
+        }
+
+        function save() {
+            localStorage.setItem('examTracker', JSON.stringify(data));
+            render();
+        }
+
+        function updateDateDisplay() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentDate').textContent =
+                `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        function buildColorSwatches() {
+            const cont = document.getElementById('colorSwatches');
+            cont.innerHTML = '';
+            COLORS.forEach((c, i) => {
+                const s = document.createElement('div');
+                s.className = 'swatch' + (i === 0 ? ' selected' : '');
+                s.style.background = c;
+                s.onclick = () => {
+                    selectedColor = c;
+                    cont.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+                    s.classList.add('selected');
+                };
+                cont.appendChild(s);
+            });
+        }
+
+        // ===== STATS =====
+        function updateStats() {
+            let totalChaps = 0, doneChaps = 0, totalMarks = 0, coveredMarks = 0;
+            data.subjects.forEach(s => {
+                s.chapters.forEach(c => {
+                    totalChaps++;
+                    totalMarks += (c.marks || 0);
+                    if (c.done) { doneChaps++; coveredMarks += (c.marks || 0); }
+                });
+            });
+            document.getElementById('statSubjects').textContent = data.subjects.length;
+            document.getElementById('statChapters').textContent = totalChaps;
+            document.getElementById('statDone').textContent = doneChaps;
+            document.getElementById('statMarks').textContent = coveredMarks;
+            const pct = totalMarks > 0 ? Math.round(coveredMarks / totalMarks * 100) : 0;
+            document.getElementById('statPct').textContent = pct + '%';
+        }
+
+        // ===== RENDER =====
+        function render() {
+            updateStats();
+            const grid = document.getElementById('subjectsGrid');
+            const empty = document.getElementById('emptyState');
+            if (data.subjects.length === 0) {
+                grid.innerHTML = '';
+                grid.appendChild(empty);
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            // remove old cards
+            grid.querySelectorAll('.subject-card').forEach(c => c.remove());
+
+            data.subjects.forEach((subj, si) => {
+                const totalM = subj.chapters.reduce((a, c) => a + (c.marks || 0), 0);
+                const doneM = subj.chapters.filter(c => c.done).reduce((a, c) => a + (c.marks || 0), 0);
+                const pct = totalM > 0 ? Math.round(doneM / totalM * 100) : 0;
+                const totalChapPaper = subj.total || 100;
+
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.dataset.si = si;
+
+                let chapHTML = '';
+                subj.chapters.forEach((ch, ci) => {
+                    chapHTML += `
+          <div class="chapter-item ${ch.done ? 'done' : ''}" onclick="toggleChapter(${si},${ci})">
+            <div class="chapter-check">${ch.done ? '✓' : ''}</div>
+            <div class="chapter-info">
+              <div class="chapter-name">${ch.name}</div>
+            </div>
+            <div class="chapter-marks">${ch.marks ? ch.marks + ' marks' : ''}</div>
+            <button class="del-chapter" onclick="delChapter(event,${si},${ci})">✕</button>
+          </div>`;
+                });
+
+                let logsHTML = '';
+                (subj.logs || []).slice().reverse().forEach((log, li) => {
+                    const realIdx = (subj.logs.length - 1 - li);
+                    logsHTML += `
+          <div class="log-entry">
+            <span class="log-date">${log.date}</span>
+            <span class="log-text">${log.text}</span>
+            <button class="del-log" onclick="delLog(event,${si},${realIdx})">✕</button>
+          </div>`;
+                });
+
+                const examDateHTML = subj.examDate ?
+                    `<div class="exam-date-badge">📅 ${subj.examDate}</div>` : '';
+
+                card.innerHTML = `
+        <div class="subject-header">
+          <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
+            <div class="subject-color-dot" style="background:${subj.color || 'var(--accent)'}"></div>
+            <div class="subject-info">
+              <div class="subject-name">${subj.name}</div>
+              <div class="subject-meta">Total: ${totalChapPaper} marks &nbsp;|&nbsp; ${subj.chapters.length} chapters</div>
+              ${examDateHTML}
+            </div>
+          </div>
+          <div class="subject-actions">
+            <button class="btn btn-danger" onclick="delSubject(event,${si})">Del</button>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>Marks Covered</span>
+            <span>${doneM} / ${totalM} marks &nbsp; (${pct}%)</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="chapters-section">
+          <div class="chapters-title">📑 Chapters / Topics</div>
+          ${chapHTML || '<div style="color:var(--muted);font-size:13px;padding:6px 0">Abhi koi chapter nahi. Neeche add karo!</div>'}
+          <div class="add-chapter-form">
+            <input type="text" placeholder="Chapter ya topic naam..." id="chapName_${si}">
+            <input type="number" placeholder="Marks" style="width:80px;flex:none" id="chapMarks_${si}">
+            <button class="btn-add-chapter" onclick="addChapter(${si})">+ Add</button>
+          </div>
+        </div>
+        <div class="daily-section">
+          <div class="daily-title">📝 Daily Log</div>
+          <div class="log-input-row">
+            <textarea id="logText_${si}" placeholder="Aaj kya parha? Kitna cover kiya? Notes likhao..."></textarea>
+            <button class="btn-log" onclick="addLog(${si})">+</button>
+          </div>
+          <div class="log-entries">${logsHTML}</div>
+        </div>`;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // ===== ACTIONS =====
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function addSubject() {
+            const name = document.getElementById('subjectName').value.trim();
+            const total = parseInt(document.getElementById('subjectTotal').value) || 100;
+            const examDate = document.getElementById('subjectExamDate').value;
+            if (!name) { alert('Subject ka naam likhna zaruri hai!'); return; }
+            data.subjects.push({ name, total, examDate, color: selectedColor, chapters: [], logs: [] });
+            save();
+            document.getElementById('subjectName').value = '';
+            document.getElementById('subjectTotal').value = '';
+            document.getElementById('subjectExamDate').value = '';
+            closeModal('addSubjectModal');
+        }
+
+        function delSubject(e, si) {
+            e.stopPropagation();
+            if (!confirm('Yeh subject aur iska sara data delete ho jayega. Pakka?')) return;
+            data.subjects.splice(si, 1);
+            save();
+        }
+
+        function addChapter(si) {
+            const nameEl = document.getElementById(`chapName_${si}`);
+            const marksEl = document.getElementById(`chapMarks_${si}`);
+            const name = nameEl.value.trim();
+            const marks = parseInt(marksEl.value) || 0;
+            if (!name) return;
+            data.subjects[si].chapters.push({ name, marks, done: false });
+            nameEl.value = ''; marksEl.value = '';
+            save();
+        }
+
+        function toggleChapter(si, ci) {
+            data.subjects[si].chapters[ci].done = !data.subjects[si].chapters[ci].done;
+            save();
+        }
+
+        function delChapter(e, si, ci) {
+            e.stopPropagation();
+            data.subjects[si].chapters.splice(ci, 1);
+            save();
+        }
+
+        function addLog(si) {
+            const el = document.getElementById(`logText_${si}`);
+            const text = el.value.trim();
+            if (!text) return;
+            const now = new Date();
+            const date = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            if (!data.subjects[si].logs) data.subjects[si].logs = [];
+            data.subjects[si].logs.push({ date, text });
+            el.value = '';
+            save();
+        }
+
+        function delLog(e, si, li) {
+            e.stopPropagation();
+            data.subjects[si].logs.splice(li, 1);
+            save();
+        }
+
+        function toggleView() {
+            compactView = !compactView;
+            document.getElementById('viewIcon').textContent = compactView ? '📂' : '📋';
+            document.getElementById('viewLabel').textContent = compactView ? 'Full View' : 'Compact View';
+            document.querySelectorAll('.chapters-section, .daily-section').forEach(el => {
+                el.style.display = compactView ? 'none' : 'block';
+            });
+        }
+
+        // Enter key for chapter input
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('chapName_')) {
+                const si = e.target.id.split('_')[1];
+                addChapter(parseInt(si));
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
